@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Questionnaire</title>
+</head>
+<body>
+  <p>Please answer mandatory questions before</p>
+    <table style="border:none">
+        <form action="/process" method = "POST">
+        <tr>
+          <td style="width: 200px">
+            Your firstname:
+          </td>
+          <td style="width: 300px">
+            <input type="text" name="firstname">
+          </td>
+        </tr>
+        <tr>
+            <td>
+              Your lastname:
+            </td>
+            <td>
+              <input type="text" name="lastname">
+            </td>
+        </tr>
+        <tr>
+          <td>
+            Work experience in years:
+          </td>
+          <td>
+            <select name = "workyears">
+              <option value="1">up to one</option>
+              <option value="3">up to three</option>
+              <option value="5">up to five</option>
+              <option value="10">up to ten</option>
+              <option value="11">more than ten</option>
+            </select>
+          </td>
+        </tr>
+          <tr>
+            <td>
+              Your level:
+            </td>
+            <td>
+              <input type="radio" id="l1" name="level" value="junior">
+              <label for="l1">Junior</label><br>
+              <input type="radio" id="l2" name="level" value="middle">
+              <label for="l2">Middle</label><br>
+              <input type="radio" id="l3" name="level" value="senior">
+              <label for="l3">Senior</label><br>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="submit" value="Submit"/>
+            </td>
+          </tr>
+        </form>
+    </table>
+
+</body>
+</html>
