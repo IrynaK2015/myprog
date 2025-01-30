@@ -1,14 +1,31 @@
 package irynak.prog;
 
 import jakarta.servlet.http.*;
-
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProcessServlet extends HttpServlet {
-    static final String ANSWER_TEMPLATE = "<html><head><title>Your answer</title></head>"
-        + "<p>I'm %s %s.<br/>My working experience is %s.<br/>I reached %s level.</p>"
+    int answerCounter = 0;
+
+    HashMap<String, Integer> ageStats = new HashMap<>();
+    HashMap<String, Integer> levelStats = new HashMap<>();
+
+    static final String ANSWER_TEMPLATE = "<html><head><title>Survey statistics</title>"
+        + "</head>"
+        + "<p>Thank you for your survey</p>"
+        + "<p>Total number of answers: %d</p>"
+        + "<p>Age statistics:<ul>%s</ul></p>"
+        + "<p>Level statistics: <ul>%s</ul></p>"
         + "</body></html>";
+
+    static final String ERROR_TEMPLATE = "<html><head><title>Validation error</title>"
+            + "</head>"
+            + "<p>%s</p>"
+            + "<p>Please  <a href=\"index.html\">try again</a></p>"
+            + "</body></html>";
+
+    static final String LIST_TEMPLATE = "<li>%s : %d</li>";
 
     enum Level {
         JUNIOR,
@@ -16,49 +33,88 @@ public class ProcessServlet extends HttpServlet {
         SENIOR
     }
 
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String firstName = request.getParameter("firstname").trim();
+            String lastName = request.getParameter("lastname").trim();
+            String age = request.getParameter("age");
+            String level = request.getParameter("level");
 
+            validateName(firstName);
+            validateName(lastName);
+            String validAge = getValidAge(age);
+            String validLevel = getValidLevel(level);
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException  {
-        String firstName = request.getParameter("firstname");
-        String lastName = request.getParameter("lastname");
-        String workYears = request.getParameter("workyears");
-        String level = request.getParameter("level");
-
-        validateNames(firstName, lastName);
-        validateWorkYears(workYears);
-        validateLevel(level);
-
-        response.getWriter().println(
-            String.format(ANSWER_TEMPLATE, firstName, lastName, workYears, level)
-        );
+            addAnswer2Stats(validAge, validLevel);
+            response.getWriter().println(getStatsOutput());
+        } catch (IOException $ex) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println(
+                String.format(ERROR_TEMPLATE, $ex.getMessage())
+            );
+        }
     }
 
-    private void validateNames(String firstName, String lastName) throws IOException {
-        if (firstName.isEmpty() || lastName.isEmpty()) {
+    private void validateName(String name) throws IOException {
+        if (name.isEmpty()) {
             throw new IOException("Please fill name fields");
         }
     }
 
-    private void validateWorkYears(String workYears) throws IOException {
-        HashMap<Integer, String> years = new HashMap<>();
-        years.put(1, "up to 1 year");
-        years.put(3, "up to 3 years");
-        years.put(5, "up to 5 years");
-        years.put(10, "up to 10 years");
-        years.put(11, "more than 10 years");
-        int year = Integer.parseInt(workYears);
-        if (!years.containsKey(year)) {
+    private String getValidAge(String age) throws IOException {
+        HashMap<Integer, String> ageMap = new HashMap<>();
+        ageMap.put(0, "younger then 18");
+        ageMap.put(25, "18 - 25");
+        ageMap.put(35, "26 - 35");
+        ageMap.put(45, "36 - 45");
+        ageMap.put(55, "46 - 55");
+        ageMap.put(56, "56 and older");
+        int ageIdx = Integer.parseInt(age);
+        if (!ageMap.containsKey(ageIdx)) {
             throw new IOException("Please select correct experience value");
         }
+        if (ageIdx  == 0) {
+            throw new IOException("You're too young");
+        }
+
+        return ageMap.get(ageIdx);
     }
 
-    private void validateLevel(String level) throws IOException {
+    private String getValidLevel(String level) throws IOException {
         for (Level enumLevel : Level.values()) {
             if (enumLevel.name().equalsIgnoreCase(level)) {
-                return;
+                return enumLevel.name();
             }
         }
 
         throw new IOException("Please select correct  level");
+    }
+
+    private void addAnswer2Stats(String age, String level) {
+        answerCounter++;
+
+        int ageCounter = ageStats.getOrDefault(age, 0);
+        ageStats.put(age, ++ageCounter);
+        int levelCounter = levelStats.getOrDefault(age, 0);
+        levelStats.put(level, ++levelCounter);
+    }
+
+    private String getFormattedMap(HashMap<String, Integer> map) {
+        String formatted = "";
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            formatted = formatted.concat(
+                String.format(LIST_TEMPLATE, entry.getKey(), entry.getValue())
+            );
+        }
+        return formatted;
+    }
+
+    private String getStatsOutput() {
+        return String.format(
+                ANSWER_TEMPLATE,
+                answerCounter,
+                getFormattedMap(ageStats),
+                getFormattedMap(levelStats)
+        );
     }
 }

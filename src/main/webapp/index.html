@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        body {font-family: sans-serif}
+        p {margin: 40px 10px 10px 10px}
+        table {border:none; margin: 40px 10px 10px 40px}
+        td {padding: 10px}
+        td.title {width: 300px}
+        input[type=text] {border: 1px solid grey; border-radius: 3px}
+    </style>
     <meta charset="UTF-8">
     <title>Questionnaire</title>
 </head>
@@ -9,15 +17,15 @@
     <table style="border:none">
         <form action="/process" method = "POST">
         <tr>
-          <td style="width: 200px">
+          <td class="title">
             Your firstname:
           </td>
-          <td style="width: 300px">
+          <td>
             <input type="text" name="firstname">
           </td>
         </tr>
         <tr>
-            <td>
+            <td class="title">
               Your lastname:
             </td>
             <td>
@@ -25,21 +33,22 @@
             </td>
         </tr>
         <tr>
-          <td>
-            Work experience in years:
+          <td class="title">
+              Your age:
           </td>
           <td>
-            <select name = "workyears">
-              <option value="1">up to one</option>
-              <option value="3">up to three</option>
-              <option value="5">up to five</option>
-              <option value="10">up to ten</option>
-              <option value="11">more than ten</option>
+            <select name = "age">
+              <option value="0">younger then 18</option>
+              <option value="25">18 - 25</option>
+              <option value="35">26 - 35</option>
+              <option value="45">36 - 45</option>
+              <option value="55">46 - 55</option>
+              <option value="55">56 and older</option>
             </select>
           </td>
         </tr>
           <tr>
-            <td>
+            <td class="title">
               Your level:
             </td>
             <td>
